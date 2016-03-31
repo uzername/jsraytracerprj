@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Wall RayTracer</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            #example { /*canvas. behaves quite weird, like it has no box model*/
+                border:1px solid #000000;
+            }
+            .generalWrapper {
+                width:100%;
+            }
+            #optionsWrap {
+                border:1px darkgrey double;
+                margin-left:auto;
+                margin-right: auto;
+            }
+            .options-itm {
+                float: left;
+                background-color: gray;
+                border: 2px solid black;
+                border-top-style: none;
+                margin-left: 1px;
+                margin-right: 1px;
+                cursor: pointer;
+            }
+                .clearfix:after {
+                visibility: hidden;
+                display: block;
+                font-size: 0;
+                content: " ";
+                clear: both;
+                height: 0;
+                }
+                #objects-options {
+                    display: none;
+                }
+                #wall-options {
+                    display: none;
+                }
+                #buttonpannel {
+                    display: none;
+                }
+                #treestable-appendline {
+                    display:table-row;
+                }
+                .treestable-dataline {
+                    display:table-row;
+                }
+                .generic-table-cell {
+                    display: table-cell; 
+                    border: solid 1px black; 
+                    width:25%;
+                    padding-bottom: 3px;
+                    padding-top: 3px;
+                }
+                #donetree {
+                    float:left;
+                    margin-left:3px;
+                    background-color: lightgray;
+                    padding:2px;
+                    border-color: darkgray;
+                    cursor: pointer;
+                }
+                #canceltree{
+                    float:left;
+                    margin-left:3px;
+                    background-color: lightgray;
+                    border-color: darkgray;
+                    cursor: pointer;
+                    padding:2px;
+                }
+                .removetree {
+                    float: left;
+                    margin-left: 5px;
+                    margin-top: 2px;
+                    margin-bottom: 2px;
+                    background-color: lightgray;
+                    border-color: darkgray;
+                    cursor: pointer;
+                    padding: 2px;
+                }
+        </style>
+        <link rel="stylesheet" type="text/css" href="fontello.css"/>
+        <!-- using jquery, because it's a heavy rich application -->
+        <script type="text/javascript" src="jquery-2.2.1.js" > </script>
+    </head>
+    <body>
+        <div> В лесу стоит стена ограниченной длины. Координаты центров и радиусов деревьев известны. Выяснить, какие части стены не будут видны наблюдателю, находящемуся в заданной точке </div>
+        <div class="generalWrapper">
+            <div id="canvaswrap" style="margin-left: auto; margin-right:auto;">
+                __
+                <canvas id="example"> Use better browser to display Html canvas </canvas>
+                __
+            </div>
+        </div>
+        <div class="generalWrapper">
+            <div id="optionsWrap" class="clearfix">
+                <div style="width:100%;" class="clearfix">
+                    <div class="options-itm" id="objects-itm">Объекты ("деревья")</div>
+                    <div class="options-itm" id="wall-itm">Стена и наблюдатель</div>
+                    <div class="options-itm">JSON data</div>
+                </div>
+                <div style="width:100%">
+                    <div id="objects-options">
+                        <div style="width: 100%;">
+                            <div style="width: 100%; padding-left: 10px;">Координаты центров и радиусы деревьев:</div>
+                            <div id="trees-table" style="width: 100%; display:table"> 
+                                <div style="display: table-row; " id="treestableheader"> 
+                                    <div class="generic-table-cell" ><span style="font-weight:bold;">X COORD</span> </div>
+                                    <div class="generic-table-cell"><span style="font-weight:bold;">Y COORD</span> </div>
+                                    <div class="generic-table-cell"><span style="font-weight:bold;">Radius</span></div>
+                                    <div class="generic-table-cell"><span style="font-weight:bold;">&nbsp;</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width:100%;" class="clearfix">
+                            <div id="newtree" style="background-color: silver; border: 1px solid gray; cursor: pointer; margin-top: 5px; float: left;">
+                                        <span style="padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;" class="icon-doc-text">&nbsp;Новый</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="wall-options">
+                        <div style="width: 100%;">
+                            <div style="width: 100%; padding-left: 10px;">Координаты начала и окончания стены:</div>
+                            <div style="display:table; width:100%;"> 
+                                <div style="display: table-row; width:100%;">
+                                    <div style="display:table-cell; width:50%;">  Начало </div>
+                                    <div style="display:table-cell; width:50%;">  Конец  </div>
+                                </div>
+                            </div>
+                            <div id="wall-table" style="width: 100%; display:table;" >
+                                
+                                <div style="display:table-row">
+                                    
+                                        <div class="generic-table-cell"><span style="font-weight:bold;">X COORD</span></div>
+                                        <div class="generic-table-cell"><span style="font-weight:bold;">Y COORD</span></div>
+                                    
+                                        <div class="generic-table-cell"><span style="font-weight:bold;">X COORD</span></div>
+                                        <div class="generic-table-cell"><span style="font-weight:bold;">Y COORD</span></div>
+                                    
+                                </div>
+                                <div style="display:table-row">
+                                    
+                                        <div class="generic-table-cell"><input type="text"></div>
+                                        <div class="generic-table-cell"><input type="text"></div>
+                                    
+                                    
+                                        <div class="generic-table-cell"><input type="text"></div>
+                                        <div class="generic-table-cell"><input type="text"></div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="width: 100%;" class="clearfix">
+                            <div style="width: 100%; padding-left: 10px;">Координаты наблюдателя:</div>
+                            <!--
+                            <div id="observer-table" style="width: 100%; display:table"> </div>
+                            -->
+                            <div style="width: 100%; padding-left: 10px; color: red; font-weight: bold">Будем считать, что наблюдатель находится в точке (0;0) - в начале координат</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function validateNumericInput(numstr) {
+                console.log(numstr);
+                var numregexp=/^-?\d+\.?\d*$/;
+                if(numstr.match(numregexp)) {  
+                    return true;  
+                } else {
+                    return false;
+                }
+            }
+            /*
+             * single tree features such data: x coordinate, y coordinate, radius
+             */
+            function singleRealTreeData(inp_x, inp_y, inp_radius) {
+                this.x=inp_x;
+                this.y=inp_y;
+                this.radius=inp_radius;
+                this.id=0;
+            }
+            
+            var allTreesRaw=[];
+            var appendLineDisplayed = false;
+            var example = document.getElementById("example");
+            var ctx = example.getContext('2d');
+            var canvasWidth= 800;
+            var canvasHeight = 600;
+            /**
+             * "Cancel" button processing routine
+             * @returns {undefined}
+             */
+            function cancelTreeClick() {
+                $("#treestable-appendline").remove();
+                appendLineDisplayed = false;
+            }
+            /**
+             * processing of 'remove single tree' command
+             * @param {epic structure} event pass evt data
+             * @returns {undefined}
+             */
+            function removeTreeClick(event) {
+                if (appendLineDisplayed===true) {
+                    console.log("rejected _remove tree click_");
+                    return; 
+                }
+                //retrieve id of clicked button
+                var theID = event.data.uniqID;
+                //remove line
+                $("#treeline"+theID).remove();
+                //remove record
+                //id is proven to be unique
+                        //console.log(allTreesRaw);
+                        //console.log(theID);
+                allTreesRaw = allTreesRaw.filter(function (e) {return e.id!==theID;});
+                        //console.log(allTreesRaw);    
+            }
+            /**
+             * "Done" button processing routine
+             * @returns {undefined}
+             */
+            function doneTreeClick() {
+                //gather data
+                var intXCoord = $("input#xcoord").val();
+                var intYCoord = $("input#ycoord").val();
+                var intRadius = $("input#rcoord").val();
+                //validate data
+                var validationfailed=false;
+                if (validateNumericInput(intXCoord)===false) { 
+                    $("input#xcoord").css("border-color","red");
+                    validationfailed=true;
+                } else {
+                    $("input#xcoord").css("border-color","");
+                }
+                if (validateNumericInput(intYCoord)===false) { 
+                    $("input#ycoord").css("border-color","red");
+                    validationfailed=true;
+                } else {
+                    $("input#ycoord").css("border-color","");
+                }
+                if (validateNumericInput(intRadius)===false) { 
+                    $("input#rcoord").css("border-color","red");
+                    validationfailed=true;
+                } else {
+                    $("input#rcoord").css("border-color","");
+                }
+                if (validationfailed===true) {return;}
+                //append data to js storage
+                var theTreeITM = new singleRealTreeData(intXCoord, intYCoord, intRadius);
+                        //theTreeITM.id = allTreesRaw.length;
+                var newTreesSize = allTreesRaw.push(theTreeITM);
+                (allTreesRaw[newTreesSize-1]).id=(Date.now().toString(36) + Math.random().toString(36).substr(2, 16)).toUpperCase();
+                //append interface line
+                var uniqueID = "remtreeno"+((allTreesRaw[newTreesSize-1]).id);
+                var uniqueLineID = "treeline"+((allTreesRaw[newTreesSize-1]).id);
+                var htmlTreeDataLine = "<div class=\"treestable-dataline\" id=\""+uniqueLineID+"\">"+
+                                        "<div class=\"generic-table-cell\">"+
+                                        "<span>"+allTreesRaw[newTreesSize-1].x+"</span>"+"</div>"+
+                                        "<div class=\"generic-table-cell\">"+
+                                        "<span>"+allTreesRaw[newTreesSize-1].y+"</span>"+"</div>"+
+                                        "<div class=\"generic-table-cell\">"+
+                                        "<span>"+allTreesRaw[newTreesSize-1].radius+"</span>"+"</div>"+
+                                        "<div class=\"generic-table-cell\">&nbsp;"+
+                                        "<div class=\"removetree icon-trash-empty\" id=\""+uniqueID+"\">"+"Удалить"+"</div>"+
+                                        "</div>";
+                $("#trees-table").append(htmlTreeDataLine);
+                $("#"+uniqueID).bind("click",{uniqID: ((allTreesRaw[newTreesSize-1]).id)},removeTreeClick);
+                //hide edit line line
+                $("#treestable-appendline").remove();
+                appendLineDisplayed = false;
+            }
+            function initScene() {
+                example.width  = canvasWidth;
+                example.height = canvasHeight;
+                document.getElementById("canvaswrap").style.width=""+canvasWidth+"px";
+                document.getElementById("optionsWrap").style.width=""+canvasWidth+"px";
+                document.getElementById("objects-itm").onclick=function () {
+                    document.getElementById("objects-options").style.display="block";
+                    document.getElementById("wall-options").style.display="none";
+                };
+                document.getElementById("wall-itm").onclick=function () {
+                    document.getElementById("objects-options").style.display="none";
+                    document.getElementById("wall-options").style.display="block";
+                };
+                document.getElementById("newtree").onclick=function() {
+                    if (appendLineDisplayed===false) {
+                        console.log("\"NEW\" clicked!");
+                        var htmlLine = "<div id=\"treestable-appendline\">"+
+                                        "<div class=\"generic-table-cell\">&nbsp;"+
+                                        "<input id=\"xcoord\" type=\"text\">"+"</div>"+
+                                        "<div class=\"generic-table-cell\">&nbsp;"+
+                                        "<input type=\"text\" id=\"ycoord\">"+"</div>"+
+                                        "<div class=\"generic-table-cell\">&nbsp;"+
+                                        "<input type=\"text\" id=\"rcoord\">"+"</div>"+
+                                        "<div class=\"generic-table-cell\">&nbsp;"+
+                                            "<div id=\"donetree\" class=\"icon-ok\">&nbsp;Готово</div>"+
+                                            "<div id=\"canceltree\" class=\"icon-cancel-circled\">&nbsp;Не то</div>"+
+                                        "</div>"+
+                                "</div>";
+                        $("#trees-table").append(htmlLine);
+                        appendLineDisplayed = true;
+                            $("#canceltree").click(cancelTreeClick);
+                            $("#donetree").click(doneTreeClick);
+                    }
+                };
+            }
+            function drawScene() {
+                ctx.strokeRect(15, 15, 266, 266);
+                ctx.strokeRect(18, 18, 260, 260);
+                ctx.fillRect(20, 20, 256, 256);
+                for (i = 0; i < 8; i += 2)
+                    for (j = 0; j < 8; j += 2) {
+                        ctx.clearRect(20 + i * 32, 20 + j * 32, 32, 32);
+                        ctx.clearRect(20 + (i + 1) * 32, 20 + (j + 1) * 32, 32, 32);
+                    }
+            }
+            function drawSceneNew() {
+                
+            }
+           //========
+           initScene();
+           //drawScene();
+        </script>
+    </body>
+</html>
