@@ -81,6 +81,12 @@
                     cursor: pointer;
                     padding: 2px;
                 }
+                #applybtn_wallparam {
+                    float: left;
+                    background-color: lightgray;
+                    border-color: darkgray;
+                    cursor: pointer;
+                }
         </style>
         <link rel="stylesheet" type="text/css" href="fontello.css"/>
         <!-- using jquery, because it's a heavy rich application -->
@@ -153,7 +159,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+                        <div id="applybtn_wallparam">Сохранить изменения</div>
                         <div style="width: 100%;" class="clearfix">
                             <div style="width: 100%; padding-left: 10px;">Координаты наблюдателя:</div>
                             <!--
@@ -308,6 +314,9 @@
                             $("#donetree").click(doneTreeClick);
                     }
                 };
+                document.getElementById("applybtn_wallparam").onclick = function () {
+                    console.log("...Saving wall parameters to js internal framework storage...");
+                }
             }
             function drawScene() {
                 ctx.strokeRect(15, 15, 266, 266);
